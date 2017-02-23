@@ -8,10 +8,6 @@ var mapOutlineImage;
 //	where in html to hold all our things
 var glContainer = document.getElementById( 'glContainer' );
 
-//	contains a list of country codes with their matching country names
-var isoFile = 'country_iso3166.json';
-var latlonFile = 'country_lat_lon.json';
-
 var camera, scene, renderer, controls;
 
 var pinsBase, pinsBaseMat;
@@ -110,20 +106,8 @@ function start( e ){
 			mapOutlineImage = new Image();
 			mapOutlineImage.src = 'images/map_outline.png';
 			mapOutlineImage.onload = function(){
-				loadCountryCodes(
-					function(){
-						loadWorldPins(
-							function(){										
-								loadContentData(								
-									function(){																	
-										initScene();
-										animate();		
-									}
-								);														
-							}
-						);
-					}
-				);
+				initScene();
+				animate();
 			};			
 		};		
 	};
@@ -255,44 +239,15 @@ function initScene() {
 	sphere.id = "base";	
 	rotating.add( sphere );	
 
-
-	for( var i in timeBins ){					
-		var bin = timeBins[i].data;
-		for( var s in bin ){
-			var set = bin[s];
-			// if( set.v < 1000000 )
-			// 	continue;
-
-			var exporterName = set.e.toUpperCase();
-			var importerName = set.i.toUpperCase();
-
-			//	let's track a list of actual countries listed in this data set
-			//	this is actually really slow... consider re-doing this with a map
-			if( $.inArray(exporterName, selectableCountries) < 0 )
-				selectableCountries.push( exporterName );
-
-			if( $.inArray(importerName, selectableCountries) < 0 )
-				selectableCountries.push( importerName );
-		}
-	}
-
-	console.log( selectableCountries );
-	
-	// load geo data (country lat lons in this case)
-	console.time('loadGeoData');
-	loadGeoData( latlonData );				
-	console.timeEnd('loadGeoData');				
-
-	console.time('buildDataVizGeometries');
-	var vizilines = buildDataVizGeometries(timeBins);
-	console.timeEnd('buildDataVizGeometries');
+	document.getElementById('loading').style.display = 'none';
 
 	visualizationMesh = new THREE.Object3D();
 	rotating.add(visualizationMesh);	
 
 	buildGUI();
 
-	selectVisualization( timeBins, '2010', ['UNITED STATES'], ['Military Weapons','Civilian Weapons', 'Ammunition'], ['Military Weapons','Civilian Weapons', 'Ammunition'] );					
+	// rotate to AMERICA
+	rotateToLatLng(37.0902,-95.7129);
 
 		// test for highlighting specific countries
 	// highlightCountry( ["United States", "Switzerland", "China"] );
@@ -320,7 +275,7 @@ function initScene() {
 	document.addEventListener( 'mousedown', onDocumentMouseDown, true );	
 	document.addEventListener( 'mouseup', onDocumentMouseUp, false );	
 	
-	masterContainer.addEventListener( 'click', onClick, true );	
+	// masterContainer.addEventListener( 'click', onClick, true );	
 	masterContainer.addEventListener( 'mousewheel', onMouseWheel, false );
 	
 	//	firefox	
@@ -418,11 +373,12 @@ function animate() {
 		}
 	);	
 
+	/*
 	for( var i in markers ){
 		var marker = markers[i];
 		marker.update();
 	}		    	
-
+	*/
 }
 
 function render() {	

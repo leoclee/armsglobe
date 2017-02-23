@@ -1,10 +1,25 @@
 var globeRadius = 1000;
 var vec3_origin = new THREE.Vector3(0,0,0);
 
-function makeConnectionLineGeometry( exporter, importer, value, type ){
-	if( exporter.countryName == undefined || importer.countryName == undefined )
-		return undefined;
+/*
+ * code derived from geopins.js
+ */
+function latLonToCenter(latitude, longitude) {
+    var rad = 100;
+    var lon = longitude - 90;
+    var lat = latitude;
+    
+    var phi = Math.PI/2 - lat * Math.PI / 180 - Math.PI * 0.01;
+    var theta = 2 * Math.PI - lon * Math.PI / 180 + Math.PI * 0.06;
+	
+	var center = new THREE.Vector3();                
+    center.x = Math.sin(phi) * Math.cos(theta) * rad;
+    center.y = Math.cos(phi) * rad;
+    center.z = Math.sin(phi) * Math.sin(theta) * rad; 
+    return center;
+}
 
+function makeConnectionLineGeometry( exporter, importer, value, type ){
 	// console.log("making connection between " + exporter.countryName + " and " + importer.countryName + " with code " + type );
 
 	var distanceBetweenCountryCenter = exporter.center.clone().subSelf(importer.center).length();		

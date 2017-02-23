@@ -1,183 +1,56 @@
-function buildDataVizGeometries( linearData ){	
-
-	var loadLayer = document.getElementById('loading');
-
-	for( var i in linearData ){
-		var yearBin = linearData[i].data;		
-
-		var year = linearData[i].t;
-		selectableYears.push(year);	
-
-		var count = 0;
-		console.log('Building data for ...' + year);
-		for( var s in yearBin ){
-			var set = yearBin[s];
-
-			var exporterName = set.e.toUpperCase();
-			var importerName = set.i.toUpperCase();
-
-			exporter = countryData[exporterName];
-			importer = countryData[importerName];	
-			
-			//	we couldn't find the country, it wasn't in our list...
-			if( exporter === undefined || importer === undefined )
-				continue;			
-
-			//	visualize this event
-			set.lineGeometry = makeConnectionLineGeometry( exporter, importer, set.v, set.wc );		
-
-			// if( s % 1000 == 0 )
-			// 	console.log( 'calculating ' + s + ' of ' + yearBin.length + ' in year ' + year);
+function addVisualizedMesh(path, parentTo) {
+	if (path) {
+		if (Array.isArray(path)) {
+			path.forEach((e) => addVisualizedMesh(e, parentTo));
+		} else {
+			if (!path.from) {
+				path.from = parentTo;
+			}
+			visualizationMesh.add(getVisualizedMesh(path));
 		}
-
-		//	use this break to only visualize one year (1992)
-		// break;
-
-		//	how to make this work?
-		// loadLayer.innerHTML = 'loading data for ' + year + '...';
-		// console.log(loadLayer.innerHTML);
-	}			
-
-	loadLayer.style.display = 'none';	
+	}
 }
 
-function getVisualizedMesh( linearData, year, countries, exportCategories, importCategories ){
-	//	for comparison purposes, all caps the country names
-	for( var i in countries ){
-		countries[i] = countries[i].toUpperCase();
-	}
-
-	//	pick out the year first from the data
-	var indexFromYear = parseInt(year) - 1992;
-	if( indexFromYear >= timeBins.length )
-		indexFromYear = timeBins.length-1;
-
-	var affectedCountries = [];
-
-	var bin = linearData[indexFromYear].data;	
-
+function getVisualizedMesh( path ){
 	var linesGeo = new THREE.Geometry();
 	var lineColors = [];
 
 	var particlesGeo = new THREE.Geometry();
 	var particleColors = [];			
 
-	// var careAboutExports = ( action === 'exports' );
-	// var careAboutImports = ( action === 'imports' );
-	// var careAboutBoth = ( action === 'both' );
-
-	//	go through the data from year, and find all relevant geometries
-	for( i in bin ){
-		var set = bin[i];
-
-		//	filter out countries we don't care about
-		var exporterName = set.e.toUpperCase();
-		var importerName = set.i.toUpperCase();
-		var relevantExport = $.inArray(exporterName, countries) >= 0;
-		var relevantImport = $.inArray(importerName, countries) >= 0;
-
-		var useExporter = relevantExport;
-		var useImporter = relevantImport;
-
-		var categoryName = reverseWeaponLookup[set.wc];
-		var relevantExportCategory = relevantExport && $.inArray(categoryName,exportCategories) >= 0;		
-		var relevantImportCategory = relevantImport && $.inArray(categoryName,importCategories) >= 0;		
-
-		if( (useImporter || useExporter) && (relevantExportCategory || relevantImportCategory) ){
-			//	we may not have line geometry... (?)
-			if( set.lineGeometry === undefined )
-				continue;
-
-			var thisLineIsExport = false;
-
-			if(exporterName == selectedCountry.countryName ){
-				thisLineIsExport = true;
-			}
-
-			var lineColor = thisLineIsExport ? new THREE.Color(exportColor) : new THREE.Color(importColor);
-
-			var lastColor;
-			//	grab the colors from the vertices
-			for( s in set.lineGeometry.vertices ){
-				var v = set.lineGeometry.vertices[s];		
-				lineColors.push(lineColor);
-				lastColor = lineColor;
-			}
-
-			//	merge it all together
-			THREE.GeometryUtils.merge( linesGeo, set.lineGeometry );
-
-			var particleColor = lastColor.clone();		
-			var points = set.lineGeometry.vertices;
-			var particleCount = Math.floor(set.v / 8000 / set.lineGeometry.vertices.length) + 1;
-			particleCount = constrain(particleCount,1,100);
-			var particleSize = set.lineGeometry.size;			
-			for( var s=0; s<particleCount; s++ ){
-				// var rIndex = Math.floor( Math.random() * points.length );
-				// var rIndex = Math.min(s,points.length-1);
-
-				var desiredIndex = s / particleCount * points.length;
-				var rIndex = constrain(Math.floor(desiredIndex),0,points.length-1);
-
-				var point = points[rIndex];						
-				var particle = point.clone();
-				particle.moveIndex = rIndex;
-				particle.nextIndex = rIndex+1;
-				if(particle.nextIndex >= points.length )
-					particle.nextIndex = 0;
-				particle.lerpN = 0;
-				particle.path = points;
-				particlesGeo.vertices.push( particle );	
-				particle.size = particleSize;
-				particleColors.push( particleColor );						
-			}			
-
-			if( $.inArray( exporterName, affectedCountries ) < 0 ){
-				affectedCountries.push(exporterName);
-			}							
-
-			if( $.inArray( importerName, affectedCountries ) < 0 ){
-				affectedCountries.push(importerName);
-			}
-
-			var vb = set.v;
-			var exporterCountry = countryData[exporterName];
-			if( exporterCountry.mapColor === undefined ){
-				exporterCountry.mapColor = vb;
-			}
-			else{				
-				exporterCountry.mapColor += vb;
-			}			
-
-			var importerCountry = countryData[importerName];
-			if( importerCountry.mapColor === undefined ){
-				importerCountry.mapColor = vb;
-			}
-			else{				
-				importerCountry.mapColor += vb;
-			}	
-
-			exporterCountry.exportedAmount += vb;
-			importerCountry.importedAmount += vb;
-
-			if( exporterCountry == selectedCountry ){				
-				selectedCountry.summary.exported[set.wc] += set.v;
-				selectedCountry.summary.exported.total += set.v;				
-			}		
-			if( importerCountry == selectedCountry ){
-				selectedCountry.summary.imported[set.wc] += set.v;
-				selectedCountry.summary.imported.total += set.v;
-			}
-
-			if( importerCountry == selectedCountry || exporterCountry == selectedCountry ){
-				selectedCountry.summary.total += set.v;	
-			}
-
-
-		}		
+	var lineGeometry = makeConnectionLineGeometry( {center:latLonToCenter(path.from.lat, path.from.lng)}, {center:latLonToCenter(path.to.lat, path.to.lng)}, 877480, "mil" );
+	var lineColor = new THREE.Color(exportColor);
+	var lastColor;
+	//	grab the colors from the vertices
+	for( s in lineGeometry.vertices ){
+		var v = lineGeometry.vertices[s];		
+		lineColors.push(lineColor);
+		lastColor = lineColor;
 	}
 
-	// console.log(selectedCountry);
+	//	merge it all together
+	THREE.GeometryUtils.merge( linesGeo, lineGeometry );
+
+	var particleColor = lastColor.clone();		
+	var points = lineGeometry.vertices;
+	var particleCount = 1;
+	var particleSize = lineGeometry.size;			
+	for( var s=0; s<particleCount; s++ ){
+		var desiredIndex = s / particleCount * points.length;
+		var rIndex = constrain(Math.floor(desiredIndex),0,points.length-1);
+
+		var point = points[rIndex];						
+		var particle = point.clone();
+		particle.moveIndex = rIndex;
+		particle.nextIndex = rIndex+1;
+		if(particle.nextIndex >= points.length )
+			particle.nextIndex = 0;
+		particle.lerpN = 0;
+		particle.path = points;
+		particlesGeo.vertices.push( particle );	
+		particle.size = particleSize;
+		particleColors.push( particleColor );						
+	}
 
 	linesGeo.colors = lineColors;	
 
@@ -226,6 +99,7 @@ function getVisualizedMesh( linearData, year, countries, exportCategories, impor
 														sizeAttenuation: true } );
 	particlesGeo.colors = particleColors;
 	var pSystem = new THREE.ParticleSystem( particlesGeo, shaderMaterial );
+	pSystem.path = path;
 	pSystem.dynamic = true;
 	splineOutline.add( pSystem );
 
@@ -245,14 +119,14 @@ function getVisualizedMesh( linearData, year, countries, exportCategories, impor
 			var path = particle.path;
 			var moveLength = path.length;
 			
-			particle.lerpN += 0.05;
+			particle.lerpN += 0.5;
 			if(particle.lerpN > 1){
 				particle.lerpN = 0;
 				particle.moveIndex = particle.nextIndex;
 				particle.nextIndex++;
 				if( particle.nextIndex >= path.length ){
-					particle.moveIndex = 0;
-					particle.nextIndex = 1;
+					addVisualizedMesh(this.path.next, this.path.to);
+					visualizationMesh.remove(this.parent);
 				}
 			}
 
@@ -267,7 +141,7 @@ function getVisualizedMesh( linearData, year, countries, exportCategories, impor
 	};		
 
 	//	return this info as part of the mesh package, we'll use this in selectvisualization
-	splineOutline.affectedCountries = affectedCountries;
+	splineOutline.affectedCountries = [];
 
 
 	return splineOutline;	
@@ -344,33 +218,37 @@ function selectVisualization( linearData, year, countries, exportCategories, imp
 
 	if( previouslySelectedCountry !== selectedCountry ){
 		if( selectedCountry ){
-			rotateTargetX = selectedCountry.lat * Math.PI/180;
-			var targetY0 = -(selectedCountry.lon - 9) * Math.PI / 180;
-            var piCounter = 0;
-			while(true) {
-                var targetY0Neg = targetY0 - Math.PI * 2 * piCounter;
-                var targetY0Pos = targetY0 + Math.PI * 2 * piCounter;
-                if(Math.abs(targetY0Neg - rotating.rotation.y) < Math.PI) {
-                    rotateTargetY = targetY0Neg;
-                    break;
-                } else if(Math.abs(targetY0Pos - rotating.rotation.y) < Math.PI) {
-                    rotateTargetY = targetY0Pos;
-                    break;
-                }
-                piCounter++;
-                rotateTargetY = wrap(targetY0, -Math.PI, Math.PI);
-			}
-            // console.log(rotateTargetY);
-            //lines commented below source of rotation error
-			//is there a more reliable way to ensure we don't rotate around the globe too much? 
-			/*
-			if( Math.abs(rotateTargetY - rotating.rotation.y) > Math.PI )
-				rotateTargetY += Math.PI;		
-			*/
-			rotateVX *= 0.6;
-			rotateVY *= 0.6;		
+			rotateToLatLng(selectedCountry.lat, selectedCountry.lon);
 		}	
 	}
     
     d3Graphs.initGraphs();
+}
+
+function rotateToLatLng(lat, lng) {
+	rotateTargetX = lat * Math.PI/180;
+	var targetY0 = -(lng - 9) * Math.PI / 180;
+	var piCounter = 0;
+	while(true) {
+		var targetY0Neg = targetY0 - Math.PI * 2 * piCounter;
+		var targetY0Pos = targetY0 + Math.PI * 2 * piCounter;
+		if(Math.abs(targetY0Neg - rotating.rotation.y) < Math.PI) {
+			rotateTargetY = targetY0Neg;
+			break;
+		} else if(Math.abs(targetY0Pos - rotating.rotation.y) < Math.PI) {
+			rotateTargetY = targetY0Pos;
+			break;
+		}
+		piCounter++;
+		rotateTargetY = wrap(targetY0, -Math.PI, Math.PI);
+	}
+	// console.log(rotateTargetY);
+	//lines commented below source of rotation error
+	//is there a more reliable way to ensure we don't rotate around the globe too much? 
+	/*
+	if( Math.abs(rotateTargetY - rotating.rotation.y) > Math.PI )
+		rotateTargetY += Math.PI;		
+	*/
+	rotateVX *= 0.6;
+	rotateVY *= 0.6;	
 }
