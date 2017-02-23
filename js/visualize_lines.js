@@ -19,9 +19,7 @@ function latLonToCenter(latitude, longitude) {
     return center;
 }
 
-function makeConnectionLineGeometry( exporter, importer, value, type ){
-	// console.log("making connection between " + exporter.countryName + " and " + importer.countryName + " with code " + type );
-
+function makeConnectionLineGeometry( exporter, importer, value ){
 	var distanceBetweenCountryCenter = exporter.center.clone().subSelf(importer.center).length();		
 
 	//	how high we want to shoot the curve upwards

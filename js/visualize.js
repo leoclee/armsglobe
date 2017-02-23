@@ -18,7 +18,7 @@ function getVisualizedMesh( path ){
 	var particlesGeo = new THREE.Geometry();
 	var particleColors = [];			
 
-	var lineGeometry = makeConnectionLineGeometry( {center:latLonToCenter(path.from.lat, path.from.lng)}, {center:latLonToCenter(path.to.lat, path.to.lng)}, 877480, "mil" );
+	var lineGeometry = makeConnectionLineGeometry( {center:latLonToCenter(path.from.lat, path.from.lng)}, {center:latLonToCenter(path.to.lat, path.to.lng)}, 877480 );
 	var lineColor = new THREE.Color(exportColor);
 	var lastColor;
 	//	grab the colors from the vertices
@@ -33,24 +33,18 @@ function getVisualizedMesh( path ){
 
 	var particleColor = lastColor.clone();		
 	var points = lineGeometry.vertices;
-	var particleCount = 1;
 	var particleSize = lineGeometry.size;			
-	for( var s=0; s<particleCount; s++ ){
-		var desiredIndex = s / particleCount * points.length;
-		var rIndex = constrain(Math.floor(desiredIndex),0,points.length-1);
-
-		var point = points[rIndex];						
-		var particle = point.clone();
-		particle.moveIndex = rIndex;
-		particle.nextIndex = rIndex+1;
-		if(particle.nextIndex >= points.length )
-			particle.nextIndex = 0;
-		particle.lerpN = 0;
-		particle.path = points;
-		particlesGeo.vertices.push( particle );	
-		particle.size = particleSize;
-		particleColors.push( particleColor );						
-	}
+	var point = points[0];						
+	var particle = point.clone();
+	particle.moveIndex = 0;
+	particle.nextIndex = 1;
+	if(particle.nextIndex >= points.length )
+		particle.nextIndex = 0;
+	particle.lerpN = 0;
+	particle.path = points;
+	particlesGeo.vertices.push( particle );	
+	particle.size = particleSize;
+	particleColors.push( particleColor );						
 
 	linesGeo.colors = lineColors;	
 
