@@ -18,7 +18,7 @@ function getVisualizedMesh( path ){
 	var particlesGeo = new THREE.Geometry();
 	var particleColors = [];			
 
-	var lineGeometry = makeConnectionLineGeometry( {center:latLonToCenter(path.from.lat, path.from.lng)}, {center:latLonToCenter(path.to.lat, path.to.lng)}, 877480 );
+	var lineGeometry = makeConnectionLineGeometry( {center:latLonToCenter(path.from.lat, path.from.lng)}, {center:latLonToCenter(path.to.lat, path.to.lng)}, 8774800000 );
 	var lineColor = new THREE.Color(exportColor);
 	var lastColor;
 	//	grab the colors from the vertices
@@ -121,6 +121,8 @@ function getVisualizedMesh( path ){
 				if( particle.nextIndex >= path.length ){
 					addVisualizedMesh(this.path.next, this.path.to);
 					visualizationMesh.remove(this.parent);
+					this.parent.remove(this);
+					break;
 				}
 			}
 
