@@ -118,6 +118,7 @@ function getVisualizedMesh( path ){
 				particle.lerpN = 0;
 				particle.moveIndex = particle.nextIndex;
 				particle.nextIndex++;
+				this.parent.material.opacity = 2 - (2*particle.moveIndex/path.length); // fade trace line after halfway point
 				if( particle.nextIndex >= path.length ){
 					addVisualizedMesh(this.path.next, this.path.to);
 					visualizationMesh.remove(this.parent);
