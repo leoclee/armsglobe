@@ -73,6 +73,7 @@ var categoryColors = {
 	'ammo' : 0x154492,
 }
 
+var defaultColor = 0xffffff;
 var exportColor = 0xdd380c;
 var importColor = 0x154492;
 

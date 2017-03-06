@@ -19,7 +19,7 @@ function getVisualizedMesh( path ){
 	var particleColors = [];			
 
 	var lineGeometry = makeConnectionLineGeometry( {center:latLonToCenter(path.from.lat, path.from.lng)}, {center:latLonToCenter(path.to.lat, path.to.lng)}, 8774800000 );
-	var lineColor = new THREE.Color(exportColor);
+	var lineColor = path.color == null ? new THREE.Color(defaultColor) : new THREE.Color(path.color);
 	var lastColor;
 	//	grab the colors from the vertices
 	for( s in lineGeometry.vertices ){
