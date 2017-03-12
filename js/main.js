@@ -109,6 +109,7 @@ function start( e ){
 			mapOutlineImage.onload = function(){
 				initScene();
 				animate();
+				$('#hudHeader').show();
 			};			
 		};		
 	};
@@ -550,4 +551,27 @@ function getPickColor(){
 		highlightCountry(affectedCountries);
 	}
 	return buf[0]; 	
+}
+
+function handleMessage(data) {
+	if (data.description != null) { 
+		var dateString = new Date(data.date ? data.date : new Date().getTime()).toLocaleTimeString()
+		$("<li><span>" + dateString + " " + data.description + "</span></li>").appendTo('#messages');
+		scrollToBottom();
+	}
+	addVisualizedMesh(data.path);
+}
+
+function scrollToBottom() {
+	var msgsOverflow = $('#messages-overflow')[0];
+	msgsOverflow.scrollTop = msgsOverflow.scrollHeight;
+
+	// trim items at the beginning of the list (to prevent browser memory
+	// leak)
+	// TODO should we do some smart trimming by detecting if elements are in
+	// the
+	// viewport? (see: http://stackoverflow.com/a/7557433)
+	// TODO on the other hand, this is pretty sweet... just not very dynamic
+	$('#messages li:lt(-75)').remove();
+	$('#messages-overflow').toggleClass("overflow", $('#messages').height() > $('#messages-overflow').height());
 }

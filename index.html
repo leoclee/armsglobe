@@ -140,11 +140,17 @@
 
 		<!-- All other hud can go here-->
         <div id="hudHeader" class="overlayCountries noPointer">
-            <h1 class="noPointer">Small Arms and Ammunition — Imports & Exports
-                <div class="subtitle">An interactive visualization of government-authorized small arms and ammunition transfers from 1992 to 2010. </div>
+            <h1 class="noPointer">Title
+                <div class="subtitle">subtitle</div>
 			</h1>
         </div>
-
+		<div id="messages-container" class="overlayCountries noPointer">
+			<div style="height:100%;">
+				<div id="messages-overflow">
+					<ul id="messages"></ul>
+				</div>
+			</div>
+		</div>
 		<div class="overlayCountries noPointer" id="hudButtons">
             <input type="button" value="SEARCH" class="searchBtn armsBtn pointer">
             <input type="text" name="country" class="countryTextInput pointer noMapDrag" value="UNITED STATES">

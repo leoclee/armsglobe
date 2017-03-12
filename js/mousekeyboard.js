@@ -78,6 +78,31 @@ function onClick( event ){
 }
 
 function onKeyDown( event ){	
+	if (event.keyCode == 32) {
+		handleMessage(
+			{
+				description : 'test message',
+				path : {
+					from : {lat:34.052234,lng:-118.243685},
+					to : {lat:39.099727,lng:-94.578567},
+					color : 0xff0000,
+					next : [
+					{
+						to : {lat:40.712784,lng:-74.005941},
+						color : 0x00ff00
+					},
+					{
+						to : {lat:25.761680,lng:-80.191790},
+						next : {
+							to : {lat:33.448377,lng:-112.074037},
+							color : 0x0000ff
+						}
+					},
+					{
+						to : {lat:-22.906847,lng:-43.172896}
+				}]}
+			});
+	}
 }
 
 function handleMWheel( delta ) {

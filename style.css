@@ -59,7 +59,7 @@
 }
 
 /* Main Styles */
-body { color:#000000; font-family:'Roboto'; font-size:14px; height:768px; min-width: 1280px; min-height: 860px; overflow: hidden;}
+body { color:#000000; font-family:'Roboto'; font-size:14px; verflow: hidden;}
 a { color:#ffffff; text-decoration:none; text-transform:uppercase; }
 a:hover { color:#8eb423; }
 h1 { font-family:'RopaSans'; font-weight:normal; }
@@ -613,4 +613,28 @@ Bar graph on left
     #importExportBtns .typeLabels .ammo {
         margin-left: -1px;
     }
+}
+
+
+
+
+
+#messages li span {
+	font-family: RopaSans;
+	display: inline-block;
+	background: rgba(0,0,0,.4);
+	color: #fff;
+}
+#messages-overflow {
+	overflow:hidden;
+	height:100%;
+}
+#messages-overflow.overflow {
+	/* TODO this only works in Chrome :P */
+	-webkit-mask-image: -webkit-linear-gradient(top, transparent 1%, white 25%);
+}
+#messages-container {
+	position: absolute;
+	height: calc(100% - 80px);
+	top:80px;
 }
