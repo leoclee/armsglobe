@@ -110,6 +110,7 @@ function start( e ){
 				initScene();
 				animate();
 				$('#hudHeader').show();
+				$('#messages-toggle').show();
 			};			
 		};		
 	};
@@ -270,7 +271,7 @@ function initScene() {
     //	-----------------------------------------------------------------------------
     //	Event listeners
 	document.addEventListener( 'mousemove', onDocumentMouseMove, true );
-	document.addEventListener( 'windowResize', onDocumentResize, false );
+	window.addEventListener( 'resize', onDocumentResize, false );
 
 	//masterContainer.addEventListener( 'mousedown', onDocumentMouseDown, true );	
 	//masterContainer.addEventListener( 'mouseup', onDocumentMouseUp, false );	
@@ -287,6 +288,10 @@ function initScene() {
 	}, false );
 
 	document.addEventListener( 'keydown', onKeyDown, false);												    			    	
+	$("#messages-toggle").click(() => {
+		$("#messages-container").toggleClass("hidden");
+		$("#messages-toggle").toggleClass("fa-chevron-circle-down").toggleClass("fa-chevron-circle-up");
+	});
 
     //	-----------------------------------------------------------------------------
     //	Setup our camera

@@ -128,4 +128,5 @@ function onMouseWheel( event ){
 }	
 
 function onDocumentResize(e){
+	scrollToBottom();
 }

@@ -618,12 +618,18 @@ Bar graph on left
 
 
 
-
+#messages {
+	padding:0;
+	margin-top:0;
+}
 #messages li span {
 	font-family: RopaSans;
 	display: inline-block;
 	background: rgba(0,0,0,.4);
 	color: #fff;
+	max-width: 500px;
+	text-indent: -20px;
+	padding-left: 20px;
 }
 #messages-overflow {
 	overflow:hidden;
@@ -631,10 +637,27 @@ Bar graph on left
 }
 #messages-overflow.overflow {
 	/* TODO this only works in Chrome :P */
-	-webkit-mask-image: -webkit-linear-gradient(top, transparent 1%, white 25%);
+	-webkit-mask-image: -webkit-linear-gradient(top, transparent 10px, white 100px);
 }
 #messages-container {
 	position: absolute;
 	height: calc(100% - 80px);
 	top:80px;
+	transition: height .5s ease-out;
+	left: 60px;
+}
+#messages-container.hidden {
+	height: 0;
+}
+#messages-toggle {
+	color:white;
+	opacity:.7;
+	top:80px;
+	position:absolute;
+	left:30px;
+	display:none;
+	font-size:25px;
+}
+#messages-toggle:hover {
+	opacity:1;
 }
