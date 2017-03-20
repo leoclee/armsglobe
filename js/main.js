@@ -289,7 +289,7 @@ function initScene() {
 
 	document.addEventListener( 'keydown', onKeyDown, false);												    			    	
 	$("#messages-toggle").click(() => {
-		$("#messages-container").toggleClass("hidden");
+		$("#messages-inner").toggleClass("hidden");
 		$("#messages-toggle").toggleClass("fa-chevron-circle-down").toggleClass("fa-chevron-circle-up");
 	});
 

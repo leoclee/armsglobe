@@ -643,11 +643,14 @@ Bar graph on left
 	position: absolute;
 	height: calc(100% - 80px);
 	top:80px;
-	transition: height .5s ease-out;
 	left: 60px;
 }
-#messages-container.hidden {
+#messages-inner.hidden {
 	height: 0;
+}
+#messages-inner {
+	height: 100%;
+	transition: height .5s ease-out;
 }
 #messages-toggle {
 	color:white;
