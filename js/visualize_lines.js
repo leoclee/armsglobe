@@ -22,9 +22,6 @@ function latLonToCenter(latitude, longitude) {
 function makeConnectionLineGeometry( exporter, importer, value ){
 	var distanceBetweenCountryCenter = exporter.center.clone().subSelf(importer.center).length();		
 
-	//	how high we want to shoot the curve upwards
-	var anchorHeight = globeRadius + distanceBetweenCountryCenter * 0.7;
-
 	//	start of the line
 	var start = exporter.center;
 
@@ -35,7 +32,7 @@ function makeConnectionLineGeometry( exporter, importer, value ){
 	var mid = start.clone().lerpSelf(end,0.5);		
 	var midLength = mid.length()
 	mid.normalize();
-	mid.multiplyScalar( midLength + distanceBetweenCountryCenter * 0.7 );			
+	mid.multiplyScalar( midLength + Math.max(distanceBetweenCountryCenter * 0.7, 10) );			
 
 	//	the normal from start to end
 	var normal = (new THREE.Vector3()).sub(start,end);
