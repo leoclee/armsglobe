@@ -140,7 +140,8 @@ function getVisualizedMesh( path ){
 	//	return this info as part of the mesh package, we'll use this in selectvisualization
 	splineOutline.affectedCountries = [];
 
-
+	splineOutline.visible = !hiddenCategories.has(path.category);
+	THREE.SceneUtils.showHierarchy(splineOutline, splineOutline.visible); // hide yo kids
 	return splineOutline;	
 }
 

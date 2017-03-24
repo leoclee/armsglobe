@@ -580,3 +580,21 @@ function scrollToBottom() {
 	$('#messages li:lt(-75)').remove();
 	$('#messages-overflow').toggleClass("overflow", $('#messages').height() > $('#messages-overflow').height());
 }
+
+var hiddenCategories = new Set();
+function setCategoryVisibility(category, visible) {
+	// show/hide any current paths with the given category
+	THREE.SceneUtils.traverseHierarchy( visualizationMesh, 
+			function(obj) {
+				if (obj && obj.path && obj.path.category === category) {
+					obj.parent.visible = visible;
+					THREE.SceneUtils.showHierarchy(obj.parent, visible); // hide yo kids
+				}
+			}
+		);
+	if (visible) {
+		hiddenCategories.delete(category);
+	} else {
+		hiddenCategories.add(category);
+	}
+}
